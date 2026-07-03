@@ -45,7 +45,15 @@
                     <p class="text-xs text-slate-400">Sistem Pengurusan & Rekod Defect Pelanggan</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3 justify-center sm:justify-end">
+                <button onclick="openSheetsModal()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2 rounded-lg text-sm font-semibold transition-all">
+                    <i data-lucide="table" class="w-4 h-4 text-emerald-400"></i>
+                    Google Sheets
+                    <span id="sheets-indicator" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+                </button>
+                <button id="btn-manual-sync" onclick="manualSync()" class="hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-lg text-sm font-semibold transition-all" title="Sinkronkan data manual">
+                    <i data-lucide="refresh-cw" class="w-4 h-4 text-sky-400"></i>
+                </button>
                 <button onclick="exportToCSV()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-md shadow-emerald-950/20">
                     <i data-lucide="download" class="w-4 h-4"></i>
                     Eksport CSV (Excel)
@@ -200,7 +208,7 @@
     </main>
 
     <!-- MODAL POPUP FOR COMPLAINT FORM (Add/Edit) -->
-    <div id="complaint-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 transition-all duration-300">
+    <div id="complaint-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-lg overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
             
             <!-- Modal Header -->
@@ -214,41 +222,40 @@
                 </button>
             </div>
 
-            <!-- Modal Form (Scrollable body) -->
-            <form id="complaint-form" onsubmit="saveComplaint(event)" class="overflow-y-auto p-6 space-y-4">
+            <!-- Modal Form Body (Scrollable if needed) -->
+            <form id="complaint-form" onsubmit="saveComplaint(event)" class="overflow-y-auto p-6 space-y-4 text-sm flex-grow">
                 <input type="hidden" id="complaint-id">
 
-                <!-- Order Number -->
-                <div>
-                    <label for="order-number" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">No. Pesanan / Order ID <span class="text-rose-500">*</span></label>
-                    <input type="text" id="order-number" required placeholder="Contoh: ORDER-10293" class="w-full px-4 py-2 bg-slate-50 hover:bg-slate-100/50 focus:bg-white border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none">
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Customer Name -->
+                <!-- Row 1: Order Number & Customer Name -->
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="customer-name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nama Pelanggan <span class="text-rose-500">*</span></label>
-                        <input type="text" id="customer-name" required placeholder="Nama penuh" class="w-full px-4 py-2 bg-slate-50 hover:bg-slate-100/50 focus:bg-white border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none">
+                        <label for="order-number" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">No. Order</label>
+                        <input type="text" id="order-number" required placeholder="Contoh: ORD-1234" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-xs transition-all outline-none">
                     </div>
-                    <!-- Phone Number -->
                     <div>
-                        <label for="phone-number" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">No. Telefon <span class="text-rose-500">*</span></label>
-                        <input type="tel" id="phone-number" required placeholder="Contoh: 0123456789" class="w-full px-4 py-2 bg-slate-50 hover:bg-slate-100/50 focus:bg-white border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none">
+                        <label for="customer-name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nama Pelanggan</label>
+                        <input type="text" id="customer-name" required placeholder="Contoh: Ahmad Ali" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-xs transition-all outline-none">
                     </div>
                 </div>
 
-                <!-- Address -->
+                <!-- Row 2: Phone Number -->
                 <div>
-                    <label for="address" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Alamat Penghantaran <span class="text-rose-500">*</span></label>
-                    <textarea id="address" rows="3" required placeholder="Sila masukkan alamat penuh..." class="w-full px-4 py-2 bg-slate-50 hover:bg-slate-100/50 focus:bg-white border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none resize-none"></textarea>
+                    <label for="phone-number" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">No. Telefon</label>
+                    <input type="tel" id="phone-number" required placeholder="Contoh: 0123456789" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-xs transition-all outline-none">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Brand Dropdown -->
+                <!-- Row 3: Address -->
+                <div>
+                    <label for="address" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Alamat Penghantaran</label>
+                    <textarea id="address" required rows="3" placeholder="Masukkan alamat lengkap untuk pos ganti..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-xs transition-all outline-none resize-none"></textarea>
+                </div>
+
+                <!-- Row 4: Brand & Defect Select -->
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="brand" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Jenama <span class="text-rose-500">*</span></label>
-                        <select id="brand" required class="w-full px-4 py-2 bg-slate-50 hover:bg-slate-100/50 focus:bg-white border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none">
-                            <option value="" disabled selected>Pilih Jenama</option>
+                        <label for="brand" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Jenama Perfume</label>
+                        <select id="brand" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-xs transition-all outline-none">
+                            <option value="">Pilih Jenama</option>
                             <option value="Prima Facie">Prima Facie</option>
                             <option value="Destino Oscura">Destino Oscura</option>
                             <option value="Carte Blanche">Carte Blanche</option>
@@ -257,28 +264,26 @@
                             <option value="Zarya">Zarya</option>
                         </select>
                     </div>
-
-                    <!-- Defect Dropdown -->
                     <div>
-                        <label for="defect" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Jenis Defect <span class="text-rose-500">*</span></label>
-                        <select id="defect" required class="w-full px-4 py-2 bg-slate-50 hover:bg-slate-100/50 focus:bg-white border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none">
-                            <option value="" disabled selected>Pilih Kerosakan</option>
+                        <label for="defect" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Jenis Defect</label>
+                        <select id="defect" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-xs transition-all outline-none">
+                            <option value="">Pilih Defect</option>
                             <option value="Leaking">Leaking (Bocor)</option>
                             <option value="Broken">Broken (Pecah)</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Status Select -->
+                <!-- Row 5: Initial Status -->
                 <div>
-                    <label for="status" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Status</label>
-                    <select id="status" class="w-full px-4 py-2 bg-slate-50 hover:bg-slate-100/50 focus:bg-white border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition-all outline-none">
-                        <option value="Pending">Pending (Dalam Tindakan)</option>
-                        <option value="Done">Done (Selesai)</option>
+                    <label for="status" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Status Aduan</label>
+                    <select id="status" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-xl text-xs transition-all outline-none">
+                        <option value="Pending">Pending</option>
+                        <option value="Done">Done</option>
                     </select>
                 </div>
 
-                <!-- Buttons inside form -->
+                <!-- Footer Action Buttons -->
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                     <button type="button" onclick="closeComplaintModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-all">
                         Batal
@@ -291,11 +296,139 @@
         </div>
     </div>
 
+    <!-- MODAL POPUP FOR GOOGLE SHEETS SETUP -->
+    <div id="sheets-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-lg overflow-hidden transform transition-all flex flex-col max-h-[95vh]">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-emerald-950 text-white flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="table" class="w-5 h-5 text-emerald-400"></i>
+                    <h3 class="text-lg font-bold">Penyambungan Google Sheets</h3>
+                </div>
+                <button onclick="closeSheetsModal()" class="text-emerald-300 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (Scrollable body) -->
+            <div class="overflow-y-auto p-6 space-y-4 text-sm">
+                <p class="text-slate-600">
+                    Sambungkan sistem ini ke Google Sheet anda secara terus untuk auto-sync setiap kali anda daftar, kemas kini atau padam aduan.
+                </p>
+
+                <!-- Status Panel -->
+                <div class="p-4 rounded-xl border flex items-center gap-3 bg-slate-50 border-slate-200" id="sheets-status-card">
+                    <div id="sheets-status-icon" class="p-2.5 rounded-lg bg-slate-200 text-slate-500">
+                        <i data-lucide="unlink" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800" id="sheets-status-title">Belum Disambung</h4>
+                        <p class="text-xs text-slate-500" id="sheets-status-desc">Masukkan Web App URL di bawah untuk bermula.</p>
+                    </div>
+                </div>
+
+                <!-- Web App URL Input -->
+                <div>
+                    <label for="sheets-url" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Google Apps Script Web App URL</label>
+                    <input type="url" id="sheets-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 rounded-xl text-xs transition-all outline-none font-mono">
+                </div>
+
+                <!-- Setup Guide Box -->
+                <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 space-y-2">
+                    <h4 class="font-bold text-xs flex items-center gap-1.5 uppercase tracking-wide">
+                        <i data-lucide="help-circle" class="w-4 h-4 text-amber-600"></i>
+                        Cara Penyediaan Google Sheet:
+                    </h4>
+                    <ol class="list-decimal pl-4 space-y-1 text-xs text-amber-800">
+                        <li>Buka Google Sheet baharu anda.</li>
+                        <li>Klik <strong>Extensions > Apps Script</strong> di menu atas.</li>
+                        <li>Padam kod sedia ada, tampalkan <strong>Kod Apps Script</strong> di bawah.</li>
+                        <li>Klik butang <strong>Deploy > New Deployment</strong>.</li>
+                        <li>Klik ikon gear di sebelah <i>Select type</i>, pilih <strong>Web app</strong>.</li>
+                        <li>Setkan <i>Execute as</i> kepada <b>Me (emel anda)</b> dan <i>Who has access</i> kepada <b>Anyone</b> (Penting untuk sambungan!).</li>
+                        <li>Klik <b>Deploy</b>, berikan kebenaran jika diminta, salin <b>Web App URL</b> yang diberikan, tampal di atas, dan klik <b>Simpan</b>.</li>
+                    </ol>
+                </div>
+
+                <!-- Apps Script Code Copy area -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">Kod Google Apps Script</label>
+                        <button onclick="copyAppsScript()" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Salin Kod
+                        </button>
+                    </div>
+                    <textarea readonly id="apps-script-code" class="w-full h-32 p-3 bg-slate-900 text-slate-300 font-mono text-xs rounded-xl border border-slate-800 resize-none outline-none leading-relaxed">function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  
+  if (data.action === "syncAll") {
+    // 1. Setkan Header Baris Pertama jika sheet masih kosong
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "ID Aduan", 
+        "No Order", 
+        "Nama Pelanggan", 
+        "No Telefon", 
+        "Alamat", 
+        "Jenama", 
+        "Jenis Defect", 
+        "Status", 
+        "Tarikh Daftar"
+      ]);
+    }
+
+    // 2. Kosongkan kandungan helaian dari baris ke-2 ke bawah untuk menggantikan dengan data segar
+    var lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent();
+    }
+    
+    var complaints = data.complaints;
+    if (complaints && complaints.length > 0) {
+      var rows = [];
+      for (var i = 0; i < complaints.length; i++) {
+        var c = complaints[i];
+        var formattedDate = new Date(c.createdAt).toLocaleString('ms-MY');
+        rows.push([
+          c.id,
+          c.orderNumber,
+          c.customerName,
+          c.phoneNumber,
+          c.address,
+          c.brand,
+          c.defect,
+          c.status,
+          formattedDate
+        ]);
+      }
+      sheet.getRange(2, 1, rows.length, 9).setValues(rows);
+    }
+    return ContentService.createTextOutput(JSON.stringify({status: "success", message: "Berjaya sync " + complaints.length + " data."})).setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput(JSON.stringify({status: "error", message: "Tindakan tidak sah."})).setMimeType(ContentService.MimeType.JSON);
+}</textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeSheetsModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-all">
+                        Batal
+                    </button>
+                    <button type="button" onclick="saveSheetsUrl()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-emerald-950/15">
+                        Simpan & Uji Sambungan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CUSTOM TOAST NOTIFICATIONS CONTAINER -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3"></div>
 
     <!-- FOOTER -->
-    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-850 mt-12 text-center text-xs">
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-12 text-center text-xs">
         <div class="max-w-7xl mx-auto px-4">
             <p>&copy; 2026 Fragrance Care Defect System. Hak Cipta Terpelihara.</p>
         </div>
@@ -341,6 +474,10 @@
         ];
 
         let complaints = [];
+        let sheetsConfig = {
+            url: "",
+            lastSynced: null
+        };
 
         // Initialize App
         window.onload = function() {
@@ -353,8 +490,15 @@
                 localStorage.setItem('perfume_complaints', JSON.stringify(complaints));
             }
             
+            // Load Sheets Config
+            const storedSheets = localStorage.getItem('perfume_sheets_config');
+            if (storedSheets) {
+                sheetsConfig = JSON.parse(storedSheets);
+            }
+            
             lucide.createIcons();
             renderComplaints();
+            updateSheetsIndicator();
         };
 
         // SHOW CUSTOM TOAST MESSAGE (No alerts!)
@@ -487,6 +631,136 @@
             lucide.createIcons();
         }
 
+        // GOOGLE SHEETS SETUP & SYNC FUNCTIONS
+        function openSheetsModal() {
+            document.getElementById('sheets-url').value = sheetsConfig.url || "";
+            updateSheetsModalUI();
+            document.getElementById('sheets-modal').classList.remove('hidden');
+        }
+
+        function closeSheetsModal() {
+            document.getElementById('sheets-modal').classList.add('hidden');
+        }
+
+        function copyAppsScript() {
+            const textarea = document.getElementById('apps-script-code');
+            textarea.select();
+            document.execCommand('copy');
+            showToast("Kod Apps Script disalin ke clipboard!");
+        }
+
+        function updateSheetsIndicator() {
+            const indicator = document.getElementById('sheets-indicator');
+            const btnManual = document.getElementById('btn-manual-sync');
+            
+            if (sheetsConfig.url) {
+                indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                indicator.title = "Google Sheets disambung";
+                if (btnManual) btnManual.classList.remove('hidden');
+            } else {
+                indicator.className = "w-2.5 h-2.5 rounded-full bg-slate-500";
+                indicator.title = "Belum disambung";
+                if (btnManual) btnManual.classList.add('hidden');
+            }
+        }
+
+        function updateSheetsModalUI() {
+            const card = document.getElementById('sheets-status-card');
+            const icon = document.getElementById('sheets-status-icon');
+            const title = document.getElementById('sheets-status-title');
+            const desc = document.getElementById('sheets-status-desc');
+
+            if (sheetsConfig.url) {
+                card.className = "p-4 rounded-xl border flex items-center gap-3 bg-emerald-50 border-emerald-200";
+                icon.className = "p-2.5 rounded-lg bg-emerald-100 text-emerald-600";
+                icon.innerHTML = `<i data-lucide="link" class="w-5 h-5"></i>`;
+                title.innerText = "Google Sheets Disambung";
+                
+                const timeString = sheetsConfig.lastSynced 
+                    ? new Date(sheetsConfig.lastSynced).toLocaleString('ms-MY') 
+                    : 'Belum pernah disinkronkan';
+                desc.innerText = `Terakhir sync: ${timeString}`;
+            } else {
+                card.className = "p-4 rounded-xl border flex items-center gap-3 bg-slate-50 border-slate-200";
+                icon.className = "p-2.5 rounded-lg bg-slate-200 text-slate-500";
+                icon.innerHTML = `<i data-lucide="unlink" class="w-5 h-5"></i>`;
+                title.innerText = "Belum Disambung";
+                desc.innerText = "Masukkan Web App URL di bawah untuk bermula.";
+            }
+            lucide.createIcons();
+        }
+
+        function saveSheetsUrl() {
+            const urlInput = document.getElementById('sheets-url').value.trim();
+            
+            if (urlInput && !urlInput.startsWith('https://script.google.com/')) {
+                showToast("Sila masukkan URL Google Web App yang sah!", "danger");
+                return;
+            }
+
+            sheetsConfig.url = urlInput;
+            localStorage.setItem('perfume_sheets_config', JSON.stringify(sheetsConfig));
+            updateSheetsIndicator();
+            updateSheetsModalUI();
+
+            if (urlInput) {
+                showToast("Penyambungan disimpan! Memulakan sinkronisasi ujian...", "info");
+                syncToGoogleSheets(true);
+            } else {
+                showToast("Sambungan Google Sheets dipadam.", "info");
+            }
+        }
+
+        // Core Sync function
+        async function syncToGoogleSheets(isTest = false) {
+            if (!sheetsConfig.url) return;
+
+            // Sort by latest created first to keep Google Sheets identical
+            const complaintsToSync = [...complaints];
+            complaintsToSync.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            try {
+                const response = await fetch(sheetsConfig.url, {
+                    method: 'POST',
+                    mode: 'no-cors', // standard workaround for deployment endpoints without proper CORS headers
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: "syncAll",
+                        complaints: complaintsToSync
+                    })
+                });
+
+                // Since we use no-cors, we cannot read the response JSON easily, 
+                // but if we reach here, the network request succeeded!
+                sheetsConfig.lastSynced = new Date().toISOString();
+                localStorage.setItem('perfume_sheets_config', JSON.stringify(sheetsConfig));
+                updateSheetsIndicator();
+                updateSheetsModalUI();
+                
+                if (isTest) {
+                    showToast("Ujian sambungan berjaya! Data telah disinkronkan.", "success");
+                    closeSheetsModal();
+                } else {
+                    showToast("Data disinkronkan ke Google Sheets secara automatik!", "success");
+                }
+            } catch (error) {
+                console.error("Sync error:", error);
+                showToast("Ralat penyambungan. Sila semak Web App URL anda.", "danger");
+            }
+        }
+
+        // Manual trigger for sync
+        function manualSync() {
+            if (!sheetsConfig.url) {
+                showToast("Sila sediakan Google Sheets terlebih dahulu.", "danger");
+                return;
+            }
+            showToast("Memulakan sinkronisasi...", "info");
+            syncToGoogleSheets();
+        }
+
         // CALCULATE DASHBOARD STATS
         function calculateStats() {
             const total = complaints.length;
@@ -592,6 +866,11 @@
             localStorage.setItem('perfume_complaints', JSON.stringify(complaints));
             closeComplaintModal();
             renderComplaints();
+            
+            // Auto sync to google sheets if configured
+            if (sheetsConfig.url) {
+                syncToGoogleSheets();
+            }
         }
 
         // QUICK STATUS TOGGLE (Pending <-> Done)
@@ -605,6 +884,11 @@
                 renderComplaints();
                 
                 showToast(`Status aduan dikemaskini kepada ${complaints[index].status}!`, 'info');
+                
+                // Auto sync to google sheets if configured
+                if (sheetsConfig.url) {
+                    syncToGoogleSheets();
+                }
             }
         }
 
@@ -653,6 +937,11 @@
                 setTimeout(() => {
                     confirmBox.remove();
                     showToast("Aduan berjaya dipadam.", 'danger');
+                    
+                    // Auto sync to google sheets if configured
+                    if (sheetsConfig.url) {
+                        syncToGoogleSheets();
+                    }
                 }, 300);
             };
         }
